@@ -1,11 +1,10 @@
 import pyshark
 import hashlib
-import json
 from datetime import datetime
+from collections import defaultdict
 
 
 def extract_tls_certificate_as_bytes(captured_packet):
-    # print(json.dumps(captured_packet.__dict__, indent=2))
     cert_hex = captured_packet._all_fields["tls.handshake.certificate"].split(":")
     return bytes.fromhex("".join(cert_hex))
 
@@ -27,14 +26,23 @@ def calculate_sha256_from_bytes(byte_data):
 
 
 def get_packet_timestamp(sniffed_packet):
-    return datetime.fromtimestamp(float(sniffed_packet.sniff_timestamp))
+    return str(datetime.fromtimestamp(float(sniffed_packet.sniff_timestamp)))
 
 
 def get_packet_tracing(sniffed_packet):
     src_address_ipv4 = None
     src_address_ipv6 = None
-    dest_address_ipv4 = None
-    dest_address_ipv6 = None
+    dst_address_ipv4 = None
+    dst_address_ipv6 = None
+
+    src_port = None
+    dst_port = None
+
+    # track src and dst ports of packet
+    if hasattr(sniffed_packet, 'tcp'):
+        tcp_data = sniffed_packet.tcp
+        src_port = tcp_data.srcport
+        dst_port = tcp_data.dstport
 
     if hasattr(sniffed_packet, 'ip'):
         # packet contains at least one IPv4 address
@@ -43,7 +51,7 @@ def get_packet_tracing(sniffed_packet):
         if hasattr(ip_data, 'src'):
             src_address_ipv4 = ip_data.src
         if hasattr(ip_data, 'dst'):
-            dest_address_ipv4 = ip_data.dst
+            dst_address_ipv4 = ip_data.dst
 
     if hasattr(sniffed_packet, 'ipv6'):
         # packet contains at least one IPv6 address
@@ -52,29 +60,48 @@ def get_packet_tracing(sniffed_packet):
         if hasattr(ipv6_data, 'src'):
             src_address_ipv6 = ipv6_data.src
         if hasattr(ipv6_data, 'dst'):
-            dest_address_ipv6 = ipv6_data.dst
+            dst_address_ipv6 = ipv6_data.dst
 
     traced_packet_ip_addresses = {}
     if src_address_ipv4:
         traced_packet_ip_addresses["src"] = {
             "addressType": "V4",
-            "address": src_address_ipv4
+            "address": src_address_ipv4,
+            "port": src_port,
+            "time": get_packet_timestamp(sniffed_packet)
         }
     if src_address_ipv6:
         traced_packet_ip_addresses["src"] = {
             "addressType": "V6",
-            "address": src_address_ipv6
+            "address": src_address_ipv6,
+            "port": src_port,
+            "time": get_packet_timestamp(sniffed_packet)
         }
-    print(src_address_ipv4, src_address_ipv6, dest_address_ipv4, dest_address_ipv6)
+    if dst_address_ipv4:
+        traced_packet_ip_addresses["dst"] = {
+            "addressType": "V4",
+            "address": dst_address_ipv4,
+            "port": dst_port,
+            "time": get_packet_timestamp(sniffed_packet)
+        }
+    if dst_address_ipv6:
+        traced_packet_ip_addresses["dst"] = {
+            "addressType": "V6",
+            "address": dst_address_ipv6,
+            "port": dst_port,
+            "time": get_packet_timestamp(sniffed_packet)
+        }
+
+    print(traced_packet_ip_addresses)
+    return traced_packet_ip_addresses
 
 
 if __name__ == '__main__':
     all_packets = extract_tls_cert_packets_from_file("captures/example_rwth.pcapng")
+    relevant_transmissions = dict()
 
     for cert_num, (full_packet, tls_packet) in enumerate(all_packets):
         cert_data = extract_tls_certificate_as_bytes(tls_packet)
-        print(full_packet.__dict__)
-        print(get_packet_timestamp(full_packet))
         save_certificate(cert_data, f"cert_{cert_num}.crt")
         get_packet_tracing(full_packet)
         print("hash", cert_num, calculate_sha256_from_bytes(cert_data))
