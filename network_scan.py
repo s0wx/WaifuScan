@@ -1,3 +1,5 @@
+import os
+
 import pyshark
 import hashlib
 import json
@@ -97,6 +99,13 @@ def get_packet_tracing(sniffed_packet):
     return traced_packet_ip_addresses
 
 
+def system_cert_crawl(start_path="."):
+    for root_path, dirs, files in os.walk(start_path):
+        for file in files:
+            if file.endswith(".pem"):
+                print(os.path.join(root_path, file))
+
+
 if __name__ == '__main__':
     capture_filepath = "captures/non_vpn_refresh.pcapng"
     all_packets = extract_tls_cert_packets_from_file(capture_filepath)
@@ -113,3 +122,5 @@ if __name__ == '__main__':
         relevant_transmissions[certificate_hash].append(get_packet_tracing(full_packet))
 
     print(json.dumps(relevant_transmissions, indent=2))
+
+    system_cert_crawl("/Users/lennard/Documents/")
