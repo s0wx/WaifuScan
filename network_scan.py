@@ -1,5 +1,6 @@
 import pyshark
 import hashlib
+import json
 from datetime import datetime
 from collections import defaultdict
 
@@ -97,19 +98,18 @@ def get_packet_tracing(sniffed_packet):
 
 
 if __name__ == '__main__':
-    all_packets = extract_tls_cert_packets_from_file("captures/example_rwth.pcapng")
+    capture_filepath = "captures/non_vpn_refresh.pcapng"
+    all_packets = extract_tls_cert_packets_from_file(capture_filepath)
     relevant_transmissions = defaultdict(list)
-    all_certificates = dict(bytes)
+    all_certificates = dict()
 
     for cert_num, (full_packet, tls_packet) in enumerate(all_packets):
         cert_data = extract_tls_certificate_as_bytes(tls_packet)
-        save_certificate(cert_data, f"cert_{cert_num}.crt")
+        save_certificate(cert_data, f"extracted_certificates/{capture_filepath.split('/')[-1]}cert_{cert_num}.crt")
 
         certificate_hash = calculate_sha256_from_bytes(cert_data)
         if certificate_hash not in all_certificates:
             all_certificates[certificate_hash] = cert_data
         relevant_transmissions[certificate_hash].append(get_packet_tracing(full_packet))
-        print("hash", cert_num, calculate_sha256_from_bytes(cert_data))
-        print("\n\n\n")
 
-    
+    print(json.dumps(relevant_transmissions, indent=2))
