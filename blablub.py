@@ -1,5 +1,4 @@
 import pyshark
-import json
 
 
 def extract_tls_certificate_as_bytes(packet):
@@ -12,25 +11,14 @@ def save_certificate(certificate_data: bytes, file_path: str):
         cert_file.write(certificate_data)
 
 
+def extract_tls_cert_packets_from_file(file_path):
+    capture = pyshark.FileCapture(file_path, display_filter="ssl.handshake.type==11")
+    return [packet.tls for packet in capture if hasattr(packet, 'tls')]
 
 
 if __name__ == '__main__':
-    cap = pyshark.FileCapture("captures/wiki_reddit_ipleak.pcapng", display_filter="ssl.handshake.type==11")
-    # cap = pyshark.FileCapture("captures/example_rwth.pcapng", display_filter="ssl.handshake.type==11")
-    tls_packets = [packet.tls for packet in cap if hasattr(packet, 'tls')]
+    tls_cert_packets = extract_tls_cert_packets_from_file("captures/example_rwth.pcapng")
 
-    cert_num = 0
-    for packet in tls_packets:
-        cert_hex = packet._all_fields["tls.handshake.certificate"].split(":")
-        print(len(cert_hex))
-        print(cert_hex)
-        print(bytes.fromhex("".join(cert_hex)))
-        cert_str = [bytes.fromhex(elem) for elem in cert_hex]
-        with open(f"cert0{cert_num}.crt", "wb") as crt_file:
-            crt_file.write(bytes.fromhex("".join(cert_hex)))
-
-        cert_num += 1
-        print(cert_str)
-
-        print(json.dumps(packet.__dict__, indent=2))
-
+    for cert_num, packet in enumerate(tls_cert_packets):
+        cert_data = extract_tls_certificate_as_bytes(packet)
+        save_certificate(cert_data, f"cert_{cert_num}.crt")
