@@ -38,23 +38,33 @@ def get_packet_tracing(sniffed_packet):
 
     if hasattr(sniffed_packet, 'ip'):
         # packet contains at least one IPv4 address
-        print(sniffed_packet.__dict__)
         ip_data = sniffed_packet.ip
-        # print(ip_data.__all_fields)
 
-        if hasattr(sniffed_packet, 'ip.src'):
-            src_address_ipv4 = sniffed_packet.ip.src
-        if hasattr(sniffed_packet, 'ip.dst'):
-            dest_address_ipv4 = sniffed_packet.ip.dst
+        if hasattr(ip_data, 'src'):
+            src_address_ipv4 = ip_data.src
+        if hasattr(ip_data, 'dst'):
+            dest_address_ipv4 = ip_data.dst
 
     if hasattr(sniffed_packet, 'ipv6'):
         # packet contains at least one IPv6 address
-        print(sniffed_packet.ipv6.__dict__)
+        ipv6_data = sniffed_packet.ipv6
 
-        if hasattr(sniffed_packet, 'ipv6.src'):
-            src_address_ipv6 = sniffed_packet.ipv6.src
-        if hasattr(sniffed_packet, 'ipv6.dst'):
-            dest_address_ipv6 = sniffed_packet.ipv6.dst
+        if hasattr(ipv6_data, 'src'):
+            src_address_ipv6 = ipv6_data.src
+        if hasattr(ipv6_data, 'dst'):
+            dest_address_ipv6 = ipv6_data.dst
+
+    traced_packet_ip_addresses = {}
+    if src_address_ipv4:
+        traced_packet_ip_addresses["src"] = {
+            "addressType": "V4",
+            "address": src_address_ipv4
+        }
+    if src_address_ipv6:
+        traced_packet_ip_addresses["src"] = {
+            "addressType": "V6",
+            "address": src_address_ipv6
+        }
     print(src_address_ipv4, src_address_ipv6, dest_address_ipv4, dest_address_ipv6)
 
 
