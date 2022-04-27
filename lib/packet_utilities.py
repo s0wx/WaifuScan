@@ -1,10 +1,5 @@
-import logging
-import os
 from datetime import datetime
-from pyshark import FileCapture, LiveCapture
-
-from lib.data_utilities import calculate_sha256_from_bytes
-from lib.file_processing import save_certificate
+from pyshark import FileCapture
 
 
 def get_packet_timestamp(sniffed_packet):
@@ -90,7 +85,7 @@ def get_packet_tracing(sniffed_packet, logger):
         }
 
     logger.info(
-        f"used for [IP{traced_packet_ip_addresses['src']['addressType']} "
+        f"Detected TLS Certificate Packet for [IP{traced_packet_ip_addresses['src']['addressType']} "
         f"{traced_packet_ip_addresses['src']['address']}:"
         f"{traced_packet_ip_addresses['src']['port']}] ---(CERTIFICATE)---> "
         f"[IP{traced_packet_ip_addresses['dst']['addressType']} "

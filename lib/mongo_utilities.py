@@ -1,9 +1,6 @@
 from pymongo import MongoClient
 
 
-certificate_database = None
-
-
 class CertificateDatabase:
     def __init__(self, host="localhost", port=27017):
         self.__db_client = MongoClient(host=host, port=port)
@@ -21,6 +18,10 @@ class CertificateDatabase:
             logger.info(f"Saved certificate {certificate_complete['sha256']} to database")
 
 
+certificate_database = CertificateDatabase()
+
+
 def database_setup():
     global certificate_database
-    certificate_database = CertificateDatabase()
+    return
+

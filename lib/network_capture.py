@@ -10,7 +10,7 @@ from lib.packet_utilities import get_packet_tracing, extract_tls_certificate_as_
 
 
 def livecapture_tls_cert(interface="en0"):
-    capture_logger = logging.getLogger("LiveCaptureCertificates")
+    capture_logger = logging.getLogger("[WaifuScan] (Network)")
     capture_logger.setLevel(level=logging.INFO)
 
     capture = LiveCapture(interface=interface, display_filter="ssl.handshake.type==11")
@@ -22,11 +22,10 @@ def livecapture_tls_cert(interface="en0"):
 
 
 def single_live_packet_extraction_local(packet):
-    capture_logger = logging.getLogger("Live (Packet)")
+    capture_logger = logging.getLogger("[WaifuScan] (Network)")
     capture_logger.setLevel(level=logging.INFO)
 
     if hasattr(packet, 'tls'):
-        capture_logger.info("Detected TLS Certificate Packet")
         packet_full, packet_tls = packet, packet.tls
         _ = get_packet_tracing(packet_full, capture_logger)
         cert_data = extract_tls_certificate_as_bytes(packet_tls)
@@ -39,11 +38,10 @@ def single_live_packet_extraction_local(packet):
 
 
 def single_live_packet_extraction_database(packet):
-    capture_logger = logging.getLogger("Live (Database)")
+    capture_logger = logging.getLogger("[WaifuScan] (Network)")
     capture_logger.setLevel(level=logging.INFO)
 
     if hasattr(packet, 'tls'):
-        capture_logger.info("Detected TLS Certificate Packet")
         packet_full, packet_tls = packet, packet.tls
         _ = get_packet_tracing(packet_full, capture_logger)
         cert_data = extract_tls_certificate_as_bytes(packet_tls)

@@ -10,8 +10,6 @@ from lib.network_capture import livecapture_tls_cert
 
 if __name__ == '__main__':
     logging.basicConfig()
-    process_logger = logging.getLogger("Certificate_Extraction")
-
     check_required_folders()
     database_setup()
 

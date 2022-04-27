@@ -1,4 +1,3 @@
-import json
 import logging
 from collections import defaultdict
 
@@ -8,7 +7,7 @@ from lib.packet_utilities import extract_tls_cert_packets_from_file, extract_tls
 
 
 def full_extract_from_file(file_path: str):
-    capture_logger = logging.getLogger("FileCaptureCertificates")
+    capture_logger = logging.getLogger("[WaifuScan] (Local)")
     capture_logger.setLevel(level=logging.INFO)
 
     all_packets = extract_tls_cert_packets_from_file(file_path)
@@ -23,5 +22,3 @@ def full_extract_from_file(file_path: str):
         if certificate_hash not in all_certificates:
             all_certificates[certificate_hash] = cert_data
         relevant_transmissions[certificate_hash].append(get_packet_tracing(full_packet, capture_logger))
-
-    print(json.dumps(relevant_transmissions, indent=2))
