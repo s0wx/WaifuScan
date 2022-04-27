@@ -13,11 +13,12 @@ class CertificateDatabase:
 
     def update_database_config(self):
         # Certificates Collection
-        self.certificates_collection.create_index("certificateSHA256", unique=True)
+        self.certificates_collection.create_index("sha256", unique=True)
 
-    def add_certificate(self, certificate_complete):
-        if not self.certificates_collection.find_one({"certificateSHA256": certificate_complete["certificateSHA256"]}):
+    def add_certificate(self, certificate_complete, logger):
+        if not self.certificates_collection.find_one({"sha256": certificate_complete["sha256"]}):
             self.certificates_collection.insert_one(certificate_complete)
+            logger.info(f"Saved certificate {certificate_complete['sha256']} to database")
 
 
 def database_setup():
