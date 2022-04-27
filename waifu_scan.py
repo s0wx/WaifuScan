@@ -4,13 +4,16 @@ import argparse
 from lib.file_capture import full_extract_from_file
 from lib.file_processing import check_required_folders
 from lib.local_capture import system_cert_crawl
+from lib.mongo_utilities import database_setup
 from lib.network_capture import livecapture_tls_cert
 
 
 if __name__ == '__main__':
     logging.basicConfig()
     process_logger = logging.getLogger("Certificate_Extraction")
+
     check_required_folders()
+    database_setup()
 
     parser = argparse.ArgumentParser()
 

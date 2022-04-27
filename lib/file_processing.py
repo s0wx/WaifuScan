@@ -16,5 +16,3 @@ def check_required_folders():
     for directory in required_folders:
         if not os.path.exists(directory):
             os.mkdir(directory)
-        else:
-            print(directory, "exists")
