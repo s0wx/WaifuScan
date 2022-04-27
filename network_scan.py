@@ -1,5 +1,5 @@
 import os
-
+import logging
 import pyshark
 import hashlib
 import json
@@ -20,6 +20,29 @@ def save_certificate(certificate_data: bytes, file_path: str):
 def extract_tls_cert_packets_from_file(file_path):
     capture = pyshark.FileCapture(file_path, display_filter="ssl.handshake.type==11")
     return [(capture_packet, capture_packet.tls) for capture_packet in capture if hasattr(capture_packet, 'tls')]
+
+
+def extract_tls_cert_packets_from_livecapture(interface="en0"):
+    capture = pyshark.LiveCapture(interface=interface, display_filter="ssl.handshake.type==11")
+    capture.set_debug()
+    logging.info(f"Selecting {interface} for live capture...")
+    relevant_transmissions = defaultdict(list)
+    all_certificates = dict()
+
+    capture.apply_on_packets(single_packet_extraction, timeout=10000)
+    capture.sniff(timeout=50)
+
+
+def single_packet_extraction(packet):
+    logging.warning("Running packet apply")
+    if hasattr(packet, 'tls'):
+        packet_full, packet_tls = packet, packet.tls
+        cert_data = extract_tls_certificate_as_bytes(packet_tls)
+        save_certificate(cert_data, f"extracted_certificates/{capture_filepath.split('/')[-1]}cert_{datetime.now()}.crt")
+
+        certificate_hash = calculate_sha256_from_bytes(cert_data)
+        return certificate_hash, cert_data, get_packet_tracing(packet_full)
+    return None, None, None
 
 
 def calculate_sha256_from_bytes(byte_data):
@@ -99,22 +122,14 @@ def get_packet_tracing(sniffed_packet):
     return traced_packet_ip_addresses
 
 
-def system_cert_crawl(start_path="."):
-    for root_path, dirs, files in os.walk(start_path):
-        for file in files:
-            if file.endswith(".pem"):
-                print(os.path.join(root_path, file))
-
-
-if __name__ == '__main__':
-    capture_filepath = "captures/non_vpn_refresh.pcapng"
+def full_extract_from_file(file_path: str):
     all_packets = extract_tls_cert_packets_from_file(capture_filepath)
     relevant_transmissions = defaultdict(list)
     all_certificates = dict()
 
     for cert_num, (full_packet, tls_packet) in enumerate(all_packets):
         cert_data = extract_tls_certificate_as_bytes(tls_packet)
-        save_certificate(cert_data, f"extracted_certificates/{capture_filepath.split('/')[-1]}cert_{cert_num}.crt")
+        save_certificate(cert_data, f"extracted_certificates/{file_path.split('/')[-1]}cert_{cert_num}.crt")
 
         certificate_hash = calculate_sha256_from_bytes(cert_data)
         if certificate_hash not in all_certificates:
@@ -123,4 +138,8 @@ if __name__ == '__main__':
 
     print(json.dumps(relevant_transmissions, indent=2))
 
-    system_cert_crawl("/Users/lennard/Documents/")
+
+if __name__ == '__main__':
+    capture_filepath = "captures/non_vpn_refresh.pcapng"
+    # full_extract_from_file(capture_filepath)
+    extract_tls_cert_packets_from_livecapture("en0")
