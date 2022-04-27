@@ -2,7 +2,7 @@ import logging
 import argparse
 
 from lib.file_capture import full_extract_from_file
-from lib.packet_utilities import extract_tls_cert_packets_from_livecapture
+from lib.network_capture import livecapture_tls_cert
 
 
 if __name__ == '__main__':
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     # Run Network Scan
     if args.network:
-        extract_tls_cert_packets_from_livecapture(args.network)
+        livecapture_tls_cert(args.network)
 
     elif args.local:
         process_logger.error("no arguments provided, terminating...")
