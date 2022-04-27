@@ -96,11 +96,25 @@ def get_packet_tracing(sniffed_packet, logger):
 
 
 def extract_tls_cert_packets_from_file(file_path):
+    """
+    Extract certificates from network capture file (e.g. .pcapng)
+
+    :param file_path: file path to capture file
+    :return: all found relevant packages for further processing
+    """
+
     capture = FileCapture(file_path, display_filter="ssl.handshake.type==11")
     return [(capture_packet, capture_packet.tls) for capture_packet in capture if hasattr(capture_packet, 'tls')]
 
 
 def extract_tls_cert_packets_from_livecapture(interface="en0"):
+    """
+    Run network sniffing on network interface (e.g. on macOS en0 for Wifi)
+
+    :param interface: Network interface of machine
+    :return:
+    """
+
     capture_logger = logging.getLogger("LiveCaptureCertificates")
     capture_logger.setLevel(level=logging.INFO)
 

@@ -1,7 +1,7 @@
 import logging
 import argparse
-import sys
 
+from lib.file_capture import full_extract_from_file
 from lib.packet_utilities import extract_tls_cert_packets_from_livecapture
 
 
@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     local_group = parser.add_argument_group("Local Scanning")
     local_group.add_argument(
-        "--local",
+        "--local", "-L",
         type=str,
         nargs=1,
         help="run local scan starting in provided path",
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     )
 
     local_group.add_argument(
-        "--file",
+        "--file", "-F",
         type=str,
         nargs=1,
         help="run local check for file provided by path (e.g. pcap format)",
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     network_group = parser.add_argument_group("Network Scanning")
     network_group.add_argument(
-        "--network",
+        "--network", "-N",
         type=str,
         nargs=1,
         help="run network scan on provided interface to sniff (e.g. en0 on macOS for Wifi)",
@@ -40,11 +40,14 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Run Network Scan
-    if args.command == "scannetwork" and args.interface:
-        extract_tls_cert_packets_from_livecapture("en0")
+    if args.network:
+        extract_tls_cert_packets_from_livecapture(args.network)
 
-    elif not args.file and not args.live:
+    elif args.local:
         process_logger.error("no arguments provided, terminating...")
-        sys.exit(0)
-    capture_filepath = "captures/non_vpn_refresh.pcapng"
-    # full_extract_from_file(capture_filepath)
+
+    elif args.file:
+        full_extract_from_file(args.file)
+
+    else:
+        parser.print_help()

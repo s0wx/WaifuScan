@@ -2,9 +2,9 @@ import json
 import logging
 from collections import defaultdict
 
+from lib.data_utilities import calculate_sha256_from_bytes
 from lib.file_processing import save_certificate
-from network_scan import calculate_sha256_from_bytes, extract_tls_certificate_as_bytes, \
-    extract_tls_cert_packets_from_file, get_packet_tracing
+from lib.packet_utilities import extract_tls_cert_packets_from_file, extract_tls_certificate_as_bytes, get_packet_tracing
 
 
 def full_extract_from_file(file_path: str):

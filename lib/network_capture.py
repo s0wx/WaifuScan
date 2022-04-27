@@ -6,7 +6,6 @@ from pyshark import LiveCapture
 from lib.data_utilities import calculate_sha256_from_bytes
 from lib.file_processing import save_certificate
 from lib.packet_utilities import get_packet_tracing, extract_tls_certificate_as_bytes
-from network_scan import single_live_packet_extraction
 
 
 def livecapture_tls_cert(interface="en0"):
