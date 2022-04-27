@@ -2,12 +2,15 @@ import logging
 import argparse
 
 from lib.file_capture import full_extract_from_file
+from lib.file_processing import check_required_folders
+from lib.local_capture import system_cert_crawl
 from lib.network_capture import livecapture_tls_cert
 
 
 if __name__ == '__main__':
     logging.basicConfig()
     process_logger = logging.getLogger("Certificate_Extraction")
+    check_required_folders()
 
     parser = argparse.ArgumentParser()
 
@@ -44,7 +47,7 @@ if __name__ == '__main__':
         livecapture_tls_cert(args.network)
 
     elif args.local:
-        process_logger.error("no arguments provided, terminating...")
+        system_cert_crawl(args.local[0])
 
     elif args.file:
         full_extract_from_file(args.file)

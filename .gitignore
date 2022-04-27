@@ -6,3 +6,4 @@
 *.pcapng
 
 __pycache__/
+CertificateDatabase/
