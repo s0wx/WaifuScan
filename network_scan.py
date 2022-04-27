@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     local_group = parser.add_argument_group("Local Scanning")
     local_group.add_argument(
-        "--localScan",
+        "--local",
         type=str,
         nargs=1,
         help="run local scan starting in provided path",
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     )
 
     local_group.add_argument(
-        "--localCheck",
+        "--file",
         type=str,
         nargs=1,
         help="run local check for file provided by path (e.g. pcap format)",
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     network_group = parser.add_argument_group("Network Scanning")
     network_group.add_argument(
-        "--networkScan",
+        "--network",
         type=str,
         nargs=1,
         help="run network scan on provided interface to sniff (e.g. en0 on macOS for Wifi)",
