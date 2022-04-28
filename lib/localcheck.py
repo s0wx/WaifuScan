@@ -4,22 +4,25 @@ import shutil
 from sys import platform
 import ssl
 
+
 def calculate_sha256_from_bytes(byte_data):
     sha256_hash = hashlib.sha256()
     sha256_hash.update(byte_data)
     return sha256_hash.hexdigest()
 
+
 def getlinuxcerts():
-    #Dort abgelagert standardmäßig auf Linux
+    # Dort abgelagert standardmäßig auf Linux
     if os.path.isfile('/etc/ssl/certs/ca-certificates.crt'):
         shutil.copy('/etc/ssl/certs/ca-certificates.crt', './OSCerts')
+
+
 def getwincerts():
     return ssl.enum_certificates("ROOT") + ssl.enum_certificates("CA") + ssl.enum_certificates("MY")
 
 
-
 def splitcerts(certificates):
-    #Separiert die einzelnen Zertifikate aus der Hauptdatei
+    # Separiert die einzelnen Zertifikate aus der Hauptdatei
     separator = '\n-----END CERTIFICATE-----'
     certs = certificates.split(separator)
 
@@ -30,10 +33,11 @@ def checkos():
     if platform == "linux" or platform == "linux2":
         return 0
     elif platform == "darwin":
-        #MacOS
+        # MacOS
         return 1
     elif platform == "win32":
         return 2
+
 
 def checkagainstcerts(encodednew):
     directory = 'CertificateFolder'
@@ -41,11 +45,13 @@ def checkagainstcerts(encodednew):
         return not os.path.isfile(f'{directory}/{encodednew}.crt')
     if checkos() == 2:
         return not os.path.isfile(f'{directory}\{encodednew}.crt')
+
+
 def linuxmain():
     if not os.path.isdir('./CertificateFolder'):
         os.mkdir('./CertificateFolder')
         print(f"Ordner für Zertifikate wird in {os.getcwd()} erstellt")
-    #Extra Ordner für
+    # Extra Ordner für
     if not os.path.isdir('./OSCerts'):
         os.mkdir('./OSCerts')
 
@@ -58,34 +64,32 @@ def linuxmain():
         for cert in certs:
             encoded = cert.encode()
             comp = calculate_sha256_from_bytes(encoded)
-            if(checkagainstcerts(comp)):
-
+            if checkagainstcerts(comp):
                 with open(f'./CertificateFolder/{comp}.crt', 'w') as f:
-
                     f.write(cert)
         print("Erfolg")
     else:
         print("Fehler!")
 
 
-
 def windowsmain():
     if not os.path.isdir('./CertificateFolder'):
         os.mkdir('./CertificateFolder')
-    #Extra Ordner für
+    # Extra Ordner für
     if not os.path.isdir('./OSCerts'):
         os.mkdir('./OSCerts')
     wincertlist = getwincerts()
-    for certs in wincertlist:
-        with ()
-
+    # for certs in wincertlist:
+    #     with ()
 
     return
+
+
 def macmain():
     return
 
-def localcheck():
 
+def localcheck():
     if checkos() == 0:
         print("Linux System erkannt:")
         linuxmain()
@@ -93,9 +97,3 @@ def localcheck():
         macmain()
     elif checkos() == 2:
         windowsmain()
-
-
-
-
-
-
