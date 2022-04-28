@@ -10,8 +10,9 @@ class NetworkScan:
         """
         Used to scan network interfaces (e.g. en0 for Wi-Fi on macOS)
 
-        :param interface:
+        :param interface: network interface to sniff
         """
+
         self.interface = interface
         self.capture_logger = logging.getLogger("[WaifuScan] (Network)")
         self.capture_logger.setLevel(level=logging.INFO)

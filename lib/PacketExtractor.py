@@ -6,7 +6,6 @@ from datetime import datetime
 from lib.data_utilities import calculate_sha256_from_bytes
 from lib.file_processing import save_certificate
 from lib.mongo_utilities import certificate_database
-from lib.packet_utilities import extract_tls_certificate_as_bytes, get_packet_tracing
 
 
 class PacketExtractor:
@@ -29,8 +28,8 @@ class PacketExtractor:
 
         if hasattr(packet, 'tls'):
             packet_full, packet_tls = packet, packet.tls
-            _ = get_packet_tracing(packet_full, self.capture_logger)
-            cert_data = extract_tls_certificate_as_bytes(packet_tls)
+            _ = self.get_packet_tracing(packet_full)
+            cert_data = self.tls_certificate_to_bytes(packet_tls)
             certificate_hash = calculate_sha256_from_bytes(cert_data)
             file_path_split = file_path.split(".")
             new_file_path = "".join(file_path_split[:-1]) + certificate_hash + "".join(file_path_split[-1:])
@@ -51,13 +50,24 @@ class PacketExtractor:
 
         if hasattr(packet, 'tls'):
             packet_full, packet_tls = packet, packet.tls
-            _ = get_packet_tracing(packet_full, self.capture_logger)
-            cert_data = extract_tls_certificate_as_bytes(packet_tls)
+            _ = self.get_packet_tracing(packet_full)
+            cert_data = self.tls_certificate_to_bytes(packet_tls)
             certificate_hash = calculate_sha256_from_bytes(cert_data)
             certificate_database.add_certificate({
                 "sha256": certificate_hash,
                 "certificateBytes": cert_data
             }, self.capture_logger)
+
+    def tls_certificate_to_bytes(self, packet):
+        """
+        Extracts only the certificate byte content from the packet as bytes
+
+        :param packet: PyShark packet containing a certificate to extract
+        :return: Certificate data as bytes
+        """
+
+        cert_hex = packet._all_fields["tls.handshake.certificate"].split(":")
+        return bytes.fromhex("".join(cert_hex))
 
     def timestamp_to_string(self, packet):
         """
