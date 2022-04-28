@@ -10,7 +10,7 @@ from lib.mongo_utilities import certificate_database
 
 
 def system_cert_crawl(start_path="."):
-    capture_logger = logging.getLogger("[WaifuScan] (Network)")
+    capture_logger = logging.getLogger("[WaifuScan] (Local)")
     capture_logger.setLevel(level=logging.INFO)
 
     start = time.time()
@@ -43,7 +43,6 @@ def system_cert_crawl(start_path="."):
                         )
 
                     stopped = time.time() - start
-                    print(f"{int(stopped)}s", file, file_type)
                     if any(file_type_option in file_type for file_type_option in ["certificate", "key"]):
                         with open(os.path.join(root_path, file), "rb") as cert_file:
                             cert_data = cert_file.read()
@@ -56,8 +55,7 @@ def system_cert_crawl(start_path="."):
 
                     # edge case for remaining filetypes
                     print(json.dumps(dict(counting), indent=2))
-                    print(f"{int(stopped)}s for {sum(counting.values())} checks")
-    print(f"TOTAL: {int(time.time() - start)} seconds for {sum(counting.values())} checks")
+                    capture_logger.info(f"Running {int(stopped)}s for {sum(counting.values())} checks --> [found: {file, file_type}]")
 
 
 def read_file_bytes_pattern(file_path):
@@ -110,6 +108,12 @@ def update_missing_cert_attributes():
 
     :return:
     """
+
+    capture_logger = logging.getLogger("[WaifuScan] (DB Alignment)")
+    capture_logger.setLevel(level=logging.INFO)
+
     for doc in certificate_database.certificates_collection.find({"dataType": None}):
         file_type = get_data_filetype_bytes(doc["certificateBytes"])
         certificate_database.certificates_collection.update_one({"_id": doc["_id"]}, {"$set": {"dataType": file_type}})
+
+    capture_logger.info("successfully aligned all database entries")
