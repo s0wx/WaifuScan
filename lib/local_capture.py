@@ -110,6 +110,12 @@ def update_missing_cert_attributes():
 
     :return:
     """
+
+    capture_logger = logging.getLogger("[WaifuScan] (DB Alignment)")
+    capture_logger.setLevel(level=logging.INFO)
+
     for doc in certificate_database.certificates_collection.find({"dataType": None}):
         file_type = get_data_filetype_bytes(doc["certificateBytes"])
         certificate_database.certificates_collection.update_one({"_id": doc["_id"]}, {"$set": {"dataType": file_type}})
+
+    capture_logger.info("successfully aligned all database entries")
