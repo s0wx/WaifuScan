@@ -2,6 +2,7 @@
 from tkinter import *
 import lib.localcheck
 
+
 class Window(Frame):
 
     def __init__(self, master=None):
@@ -11,7 +12,7 @@ class Window(Frame):
         # widget can take all window
         self.pack(fill=BOTH, expand=1)
 
-        localCheckButton = Button(self, text="check local certificates", command=self.clickLocalCheckButton)
+        localCheckButton = Button(self, text="check local certificates", bg = "green", command=self.clickLocalCheckButton)
         localCheckButton.place(x=0, y=0)
 
     def clickExitButton(self):
@@ -22,8 +23,8 @@ class Window(Frame):
         lib.localcheck.localcheck()
 
 
-    def clickMonitorNetworkCerts(self):
-        return
+    #def clickMonitorNetworkCerts(self):
+        #return
 
 if __name__ == '__main__':
     root = Tk()
