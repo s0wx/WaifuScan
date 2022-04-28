@@ -2,6 +2,7 @@ import hashlib
 import os
 import shutil
 from sys import platform
+import ssl
 
 def calculate_sha256_from_bytes(byte_data):
     sha256_hash = hashlib.sha256()
@@ -12,6 +13,10 @@ def getlinuxcerts():
     #Dort abgelagert standardmäßig auf Linux
     if os.path.isfile('/etc/ssl/certs/ca-certificates.crt'):
         shutil.copy('/etc/ssl/certs/ca-certificates.crt', './OSCerts')
+def getwincerts():
+    return ssl.enum_certificates("ROOT") + ssl.enum_certificates("CA") + ssl.enum_certificates("MY")
+
+
 
 def splitcerts(certificates):
     #Separiert die einzelnen Zertifikate aus der Hauptdatei
@@ -70,6 +75,9 @@ def windowsmain():
     #Extra Ordner für
     if not os.path.isdir('./OSCerts'):
         os.mkdir('./OSCerts')
+    wincertlist = getwincerts()
+    for certs in wincertlist:
+        with ()
 
 
     return
