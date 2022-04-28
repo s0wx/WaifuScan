@@ -3,7 +3,7 @@ import argparse
 
 from lib.file_capture import full_extract_from_file
 from lib.file_processing import check_required_folders
-from lib.local_capture import system_cert_crawl, update_missing_cert_attributes
+from lib.local_capture import system_cert_crawl, update_missing_cert_attributes, export_database
 from lib.network_capture import livecapture_tls_cert
 
 
@@ -39,11 +39,17 @@ if __name__ == '__main__':
         metavar="INTERFACE"
     )
 
-    database_group = parser.add_argument_group("Database Alignment")
+    database_group = parser.add_argument_group("Database Management")
     database_group.add_argument(
         "--dbAlign", "-dA",
         action="store_true",
         help="align all database objects which differ from latest defined properties (e.g. missing dataType)",
+    )
+
+    database_group.add_argument(
+        "--export", "-E",
+        action="store_true",
+        help="export all certificates from database",
     )
 
     args = parser.parse_args()
@@ -61,6 +67,8 @@ if __name__ == '__main__':
     elif args.dbAlign:
         update_missing_cert_attributes()
 
+    elif args.export:
+        export_database()
+
     else:
-        print(args)
         parser.print_help()

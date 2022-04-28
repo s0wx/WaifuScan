@@ -108,3 +108,25 @@ def update_missing_cert_attributes():
         certificate_database.certificates_collection.update_one({"_id": doc["_id"]}, {"$set": {"dataType": file_type}})
 
     capture_logger.info("successfully aligned all database entries")
+
+
+def export_database():
+    """
+    export certificate database
+
+    :return:
+    """
+
+    capture_logger = logging.getLogger("[WaifuScan] (DB Export)")
+    capture_logger.setLevel(level=logging.INFO)
+
+    for doc in certificate_database.certificates_collection.find():
+        file_bytes = doc["certificateBytes"]
+
+        if "certificate" in doc["dataType"]:
+            with open(f"ExportDB/{doc['sha256']}.crt", "wb") as byte_file:
+                byte_file.write(file_bytes)
+        elif "key" in doc["dataType"]:
+            with open(f"ExportDB/{doc['sha256']}.txt", "wb") as byte_file:
+                byte_file.write(file_bytes)
+    capture_logger.info("successfully exported all database entries")
