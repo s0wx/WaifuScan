@@ -11,7 +11,7 @@ def calculate_sha256_from_bytes(byte_data):
 def getlinuxcerts():
     #Dort abgelagert standardmäßig auf Linux
     if os.path.isfile('/etc/ssl/certs/ca-certificates.crt'):
-        shutil.copy('/etc/ssl/certs/ca-certificates.crt', '../OSCerts')
+        shutil.copy('/etc/ssl/certs/ca-certificates.crt', './OSCerts')
 
 def splitcerts(certificates):
     #Separiert die einzelnen Zertifikate aus der Hauptdatei
@@ -37,16 +37,16 @@ def checkagainstcerts(encodednew):
     if checkos() == 2:
         return not os.path.isfile(f'{directory}\{encodednew}.crt')
 def linuxmain():
-    if not os.path.isdir('../CertificateFolder'):
-        os.mkdir('../CertificateFolder')
+    if not os.path.isdir('./CertificateFolder'):
+        os.mkdir('./CertificateFolder')
         print(f"Ordner für Zertifikate wird in {os.getcwd()} erstellt")
     #Extra Ordner für
-    if not os.path.isdir('../OSCerts'):
-        os.mkdir('../OSCerts')
+    if not os.path.isdir('./OSCerts'):
+        os.mkdir('./OSCerts')
 
     getlinuxcerts()
-    if os.path.isfile('../OSCerts/ca-certificates.crt'):
-        f = open('../OSCerts/ca-certificates.crt', "r")
+    if os.path.isfile('./OSCerts/ca-certificates.crt'):
+        f = open('./OSCerts/ca-certificates.crt', "r")
 
         certs = splitcerts(f.read())
 
@@ -55,7 +55,7 @@ def linuxmain():
             comp = calculate_sha256_from_bytes(encoded)
             if(checkagainstcerts(comp)):
 
-                with open(f'../CertificateFolder/{comp}.crt', 'w') as f:
+                with open(f'./CertificateFolder/{comp}.crt', 'w') as f:
 
                     f.write(cert)
         print("Erfolg")
@@ -65,11 +65,11 @@ def linuxmain():
 
 
 def windowsmain():
-    if not os.path.isdir('../CertificateFolder'):
-        os.mkdir('../CertificateFolder')
+    if not os.path.isdir('./CertificateFolder'):
+        os.mkdir('./CertificateFolder')
     #Extra Ordner für
-    if not os.path.isdir('../OSCerts'):
-        os.mkdir('../OSCerts')
+    if not os.path.isdir('./OSCerts'):
+        os.mkdir('./OSCerts')
 
 
     return
@@ -85,8 +85,6 @@ def localcheck():
         macmain()
     elif checkos() == 2:
         windowsmain()
-
-
 
 
 
