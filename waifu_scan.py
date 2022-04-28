@@ -4,7 +4,7 @@ import argparse
 from lib.file_capture import full_extract_from_file
 from lib.file_processing import check_required_folders
 from lib.local_capture import system_cert_crawl, update_missing_cert_attributes, export_database
-from lib.network_capture import livecapture_tls_cert
+from lib.network_capture import live_capture_tls_cert
 
 
 if __name__ == '__main__':
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # Run Network Scan
     if args.network:
-        livecapture_tls_cert(args.network)
+        live_capture_tls_cert(args.network)
 
     elif args.local:
         system_cert_crawl(args.local[0])

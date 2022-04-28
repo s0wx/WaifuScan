@@ -9,16 +9,26 @@ from lib.mongo_utilities import certificate_database
 from lib.packet_utilities import get_packet_tracing, extract_tls_certificate_as_bytes
 
 
-def livecapture_tls_cert(interface="en0"):
-    capture_logger = logging.getLogger("[WaifuScan] (Network)")
-    capture_logger.setLevel(level=logging.INFO)
+class NetworkScan:
+    def __init__(self, interface):
+        self.interface = interface
+        self.capture_logger = logging.getLogger("[WaifuScan] (Network)")
+        self.capture_logger.setLevel(level=logging.INFO)
 
-    capture = LiveCapture(interface=interface, display_filter="ssl.handshake.type==11")
-    capture.set_debug()
-    capture_logger.info(f"Selecting {interface} for live capture...")
+    def start_tls_cert_scan(self):
+        """
+        Start Network Scan for Certificates only considering "TLS Handshake Type Certificate".
 
-    capture.apply_on_packets(single_live_packet_extraction_database, timeout=10000)
-    capture.sniff(timeout=50)
+        Extracted packets will be saved to Database if not tracked yet.
+
+        :return:
+        """
+
+        capture = LiveCapture(interface=self.interface, display_filter="ssl.handshake.type==11")
+        self.capture_logger.info(f"Starting LiveCapture on {self.interface}...")
+
+        capture.apply_on_packets(single_live_packet_extraction_database, timeout=10000)
+        capture.sniff(timeout=50)
 
 
 def single_live_packet_extraction_local(packet):
