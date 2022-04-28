@@ -10,7 +10,8 @@ def check_required_folders():
     required_folders = [
         "extracted_certificates",
         "captures",
-        "CertificateDatabase"
+        "CertificateDatabase",
+        "ExportDB"
     ]
 
     for directory in required_folders:
