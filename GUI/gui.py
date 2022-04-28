@@ -1,3 +1,4 @@
+#! /usr/bin/python3
 from tkinter import *
 import localcheck
 
@@ -19,7 +20,10 @@ class Window(Frame):
     def clickLocalCheckButton(self):
 
         localcheck.localcheck()
-        print("test 2")
+
+
+    def clickMonitorNetworkCerts(self):
+        return
 
 if __name__ == '__main__':
     root = Tk()
