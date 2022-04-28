@@ -3,15 +3,14 @@ import argparse
 
 from lib.file_capture import full_extract_from_file
 from lib.file_processing import check_required_folders
-from lib.local_capture import system_cert_crawl
-from lib.mongo_utilities import database_setup
+from lib.local_capture import system_cert_crawl, get_data_filetype_bytes
+from lib.mongo_utilities import database_setup, certificate_database
 from lib.network_capture import livecapture_tls_cert
 
 
 if __name__ == '__main__':
     logging.basicConfig()
     check_required_folders()
-    database_setup()
 
     parser = argparse.ArgumentParser()
 
