@@ -1,12 +1,19 @@
 import json
+import logging
 import os
 import subprocess
 import sys
 import time
 from collections import defaultdict
 
+from lib.data_utilities import calculate_sha256_from_bytes
+from lib.mongo_utilities import certificate_database
+
 
 def system_cert_crawl(start_path="."):
+    capture_logger = logging.getLogger("[WaifuScan] (Network)")
+    capture_logger.setLevel(level=logging.INFO)
+
     start = time.time()
     counting = defaultdict(int)
     pattern_detection = dict()
@@ -21,6 +28,7 @@ def system_cert_crawl(start_path="."):
         ".pfx",
         ".p12"
     ]
+
 
     for root_path, dirs, files in os.walk(start_path):
         for file in files:
@@ -39,15 +47,22 @@ def system_cert_crawl(start_path="."):
 
                     stopped = time.time() - start
                     print(f"{int(stopped)}s", file, file_info)
-                    if "certificate" in file_info.lower():
-                        print("CERTIFICATE\n")
-                    elif "key" in file_info.lower():
-                        print("KEY\n")
+                    if any(file_type in file_info.lower() for file_type in ["certificate", "key"]):
+                        with open(os.path.join(root_path, file), "rb") as cert_file:
+                            cert_data = cert_file.read()
+                            certificate_hash = calculate_sha256_from_bytes(cert_data)
+                            certificate_database.add_certificate({
+                                "sha256": certificate_hash,
+                                "certificateBytes": cert_data,
+                                "dataType": file_info.lower()
+                            }, capture_logger)
+
+                    # edge case for remaining filetypes
                     print(json.dumps(dict(counting), indent=2))
                     print(f"{int(stopped)}s for {sum(counting.values())} checks")
-                    print(json.dumps({key: f"{len(value)} pattern length" for key, value in pattern_detection.items()}, indent=2))
+                    # print(json.dumps({key: f"{len(value)} pattern length" for key, value in pattern_detection.items()}, indent=2))
     print(f"TOTAL: {int(time.time() - start)} seconds for {sum(counting.values())} checks")
-    print(json.dumps(pattern_detection, indent=2))
+    # print(json.dumps(pattern_detection, indent=2))
 
 
 def read_file_bytes_pattern(file_path):
@@ -69,3 +84,14 @@ def compare_byte_pattern(check, reference):
             if key not in reference or check[key] != reference[key]:
                 check_copy.pop(key)
         return check_copy
+
+
+def check_byte_pattern_nested(check_pattern, existing_patterns):
+    next_patterns = set(existing_patterns)
+    patterns_updated = False
+    for pattern in existing_patterns:
+        start_found = False
+        end_found = False
+
+
+
