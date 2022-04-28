@@ -3,8 +3,7 @@ import argparse
 
 from lib.file_capture import full_extract_from_file
 from lib.file_processing import check_required_folders
-from lib.local_capture import system_cert_crawl, get_data_filetype_bytes
-from lib.mongo_utilities import database_setup, certificate_database
+from lib.local_capture import system_cert_crawl
 from lib.network_capture import livecapture_tls_cert
 
 
@@ -47,11 +46,7 @@ if __name__ == '__main__':
         livecapture_tls_cert(args.network)
 
     elif args.local:
-        for doc in certificate_database.certificates_collection.find({"dataType": None}):
-            print(get_data_filetype_bytes(doc["certificateBytes"]))
-            # certificate_database.certificates_collection.update_one({ "_id": doc["_id"]}, {"dataType": })
-            print(doc)
-        # system_cert_crawl(args.local[0])
+        system_cert_crawl(args.local[0])
 
     elif args.file:
         full_extract_from_file(args.file)

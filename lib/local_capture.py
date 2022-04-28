@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import subprocess
-import sys
 import time
 from collections import defaultdict
 
@@ -29,40 +28,36 @@ def system_cert_crawl(start_path="."):
         ".p12"
     ]
 
-
     for root_path, dirs, files in os.walk(start_path):
         for file in files:
             for ext in certificate_extensions:
                 if file.endswith(ext):
-                    file_type_command = subprocess.check_output("file " + os.path.join(root_path, file).replace(' ', '\ '), shell=True)
-                    file_info = file_type_command.decode("utf-8").split(":")[-1].strip()
-                    counting[file_info.lower()] += 1
-                    if file_info.lower() not in pattern_detection:
-                        pattern_detection[file_info.lower()] = read_file_bytes_pattern(os.path.join(root_path, file))
+                    file_type = get_data_filetype_path(root_path=root_path, file=file)
+                    counting[file_type] += 1
+                    if file_type not in pattern_detection:
+                        pattern_detection[file_type] = read_file_bytes_pattern(os.path.join(root_path, file))
                     else:
-                        pattern_detection[file_info.lower()] = compare_byte_pattern(
+                        pattern_detection[file_type] = compare_byte_pattern(
                             read_file_bytes_pattern(os.path.join(root_path, file)),
-                            pattern_detection[file_info.lower()]
+                            pattern_detection[file_type]
                         )
 
                     stopped = time.time() - start
-                    print(f"{int(stopped)}s", file, file_info)
-                    if any(file_type in file_info.lower() for file_type in ["certificate", "key"]):
+                    print(f"{int(stopped)}s", file, file_type)
+                    if any(file_type_option in file_type for file_type_option in ["certificate", "key"]):
                         with open(os.path.join(root_path, file), "rb") as cert_file:
                             cert_data = cert_file.read()
                             certificate_hash = calculate_sha256_from_bytes(cert_data)
                             certificate_database.add_certificate({
                                 "sha256": certificate_hash,
                                 "certificateBytes": cert_data,
-                                "dataType": file_info.lower()
+                                "dataType": file_type
                             }, capture_logger)
 
                     # edge case for remaining filetypes
                     print(json.dumps(dict(counting), indent=2))
                     print(f"{int(stopped)}s for {sum(counting.values())} checks")
-                    # print(json.dumps({key: f"{len(value)} pattern length" for key, value in pattern_detection.items()}, indent=2))
     print(f"TOTAL: {int(time.time() - start)} seconds for {sum(counting.values())} checks")
-    # print(json.dumps(pattern_detection, indent=2))
 
 
 def read_file_bytes_pattern(file_path):
@@ -107,3 +102,14 @@ def get_data_filetype_path(root_path, file):
     file_type_command = subprocess.check_output("file " + os.path.join(root_path, file).replace(' ', '\ '), shell=True)
     file_info = file_type_command.decode("utf-8").split(":")[-1].strip()
     return file_info.lower()
+
+
+def update_missing_cert_attributes():
+    """
+    Add missing certificate type to database object
+
+    :return:
+    """
+    for doc in certificate_database.certificates_collection.find({"dataType": None}):
+        file_type = get_data_filetype_bytes(doc["certificateBytes"])
+        certificate_database.certificates_collection.update_one({"_id": doc["_id"]}, {"$set": {"dataType": file_type}})

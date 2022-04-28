@@ -24,4 +24,3 @@ certificate_database = CertificateDatabase()
 def database_setup():
     global certificate_database
     return
-
