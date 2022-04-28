@@ -15,7 +15,6 @@ def system_cert_crawl(start_path="."):
 
     start = time.time()
     counting = defaultdict(int)
-    pattern_detection = dict()
     certificate_extensions = [
         ".pem",
         ".crt"
@@ -34,14 +33,6 @@ def system_cert_crawl(start_path="."):
                 if file.endswith(ext):
                     file_type = get_data_filetype_path(root_path=root_path, file=file)
                     counting[file_type] += 1
-                    if file_type not in pattern_detection:
-                        pattern_detection[file_type] = read_file_bytes_pattern(os.path.join(root_path, file))
-                    else:
-                        pattern_detection[file_type] = compare_byte_pattern(
-                            read_file_bytes_pattern(os.path.join(root_path, file)),
-                            pattern_detection[file_type]
-                        )
-
                     stopped = time.time() - start
                     if any(file_type_option in file_type for file_type_option in ["certificate", "key"]):
                         with open(os.path.join(root_path, file), "rb") as cert_file:
@@ -79,12 +70,12 @@ def compare_byte_pattern(check, reference):
         return check_copy
 
 
-def check_byte_pattern_nested(check_pattern, existing_patterns):
-    next_patterns = set(existing_patterns)
-    patterns_updated = False
-    for pattern in existing_patterns:
-        start_found = False
-        end_found = False
+# def check_byte_pattern_nested(check_pattern, existing_patterns):
+#     next_patterns = set(existing_patterns)
+#     patterns_updated = False
+#     for pattern in existing_patterns:
+#         start_found = False
+#         end_found = False
 
 
 def get_data_filetype_bytes(data_bytes):
