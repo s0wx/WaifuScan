@@ -94,4 +94,16 @@ def check_byte_pattern_nested(check_pattern, existing_patterns):
         end_found = False
 
 
+def get_data_filetype_bytes(data_bytes):
+    with open("cert_buffer_file", "wb") as buffer_file:
+        buffer_file.write(data_bytes)
+    file_type_command = subprocess.check_output("file cert_buffer_file", shell=True)
+    os.unlink("cert_buffer_file")
+    file_info = file_type_command.decode("utf-8").split(":")[-1].strip()
+    return file_info.lower()
 
+
+def get_data_filetype_path(root_path, file):
+    file_type_command = subprocess.check_output("file " + os.path.join(root_path, file).replace(' ', '\ '), shell=True)
+    file_info = file_type_command.decode("utf-8").split(":")[-1].strip()
+    return file_info.lower()
