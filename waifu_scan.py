@@ -47,11 +47,8 @@ if __name__ == '__main__':
         livecapture_tls_cert(args.network)
 
     elif args.local:
-        for doc in certificate_database.certificates_collection.find({"dataType": None}):
-            print(get_data_filetype_bytes(doc["certificateBytes"]))
-            # certificate_database.certificates_collection.update_one({ "_id": doc["_id"]}, {"dataType": })
-            print(doc)
-        # system_cert_crawl(args.local[0])
+        update_missing_cert_attributes()
+        # jsystem_cert_crawl(args.local[0])
 
     elif args.file:
         full_extract_from_file(args.file)
