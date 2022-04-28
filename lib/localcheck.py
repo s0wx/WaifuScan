@@ -39,12 +39,12 @@ def checkagainstcerts(encodednew):
 def linuxmain():
     if not os.path.isdir('../CertificateFolder'):
         os.mkdir('../CertificateFolder')
+        print(f"Ordner für Zertifikate wird in {os.path} erstellt")
     #Extra Ordner für
     if not os.path.isdir('../OSCerts'):
         os.mkdir('../OSCerts')
 
     getlinuxcerts()
-
     if os.path.isfile('../OSCerts/ca-certificates.crt'):
         f = open('../OSCerts/ca-certificates.crt', "r")
 
@@ -58,6 +58,9 @@ def linuxmain():
                 with open(f'../CertificateFolder/{comp}.crt', 'w') as f:
 
                     f.write(cert)
+        print("Erfolg")
+    else:
+        print("Fehler!")
 
 
 
@@ -76,6 +79,7 @@ def macmain():
 def localcheck():
 
     if checkos() == 0:
+        print("Linux System erkannt:")
         linuxmain()
     elif checkos() == 1:
         macmain()
