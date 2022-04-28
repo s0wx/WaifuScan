@@ -1,4 +1,4 @@
-name: Hackathon
+name: WaifuScan
 channels:
   - defaults
 dependencies:
@@ -23,4 +23,4 @@ dependencies:
     - lxml==4.8.0
     - py==1.11.0
     - pyshark==0.4.5
-prefix: /opt/anaconda3/envs/Hackathon
+prefix: /opt/anaconda3/envs/WaifuScan

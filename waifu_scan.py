@@ -1,10 +1,11 @@
 import logging
 import argparse
 
+from lib.PacketExtractor import PacketExtractor
 from lib.file_capture import full_extract_from_file
 from lib.file_processing import check_required_folders
 from lib.local_capture import system_cert_crawl, update_missing_cert_attributes, export_database
-from lib.network_capture import live_capture_tls_cert
+from lib.NetworkScan import NetworkScan
 
 
 if __name__ == '__main__':
@@ -56,7 +57,9 @@ if __name__ == '__main__':
 
     # Run Network Scan
     if args.network:
-        live_capture_tls_cert(args.network)
+        packet_extractor = PacketExtractor()
+        network_scanner = NetworkScan(args.network[0], packet_extractor)
+        network_scanner.start_tls_cert_scan()
 
     elif args.local:
         system_cert_crawl(args.local[0])
