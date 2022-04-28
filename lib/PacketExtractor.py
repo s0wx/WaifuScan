@@ -1,6 +1,8 @@
 import logging
 import os
 
+from datetime import datetime
+
 from lib.data_utilities import calculate_sha256_from_bytes
 from lib.file_processing import save_certificate
 from lib.mongo_utilities import certificate_database
@@ -56,3 +58,97 @@ class PacketExtractor:
                 "sha256": certificate_hash,
                 "certificateBytes": cert_data
             }, self.capture_logger)
+
+    def timestamp_to_string(self, packet):
+        """
+        Returns the sniff_timestamp as readable string date format
+
+        :param packet: packet to track
+        :return: packet date as string
+        """
+
+        return str(datetime.fromtimestamp(float(packet.sniff_timestamp)))
+
+    def get_packet_tracing(self, packet):
+        """
+        Get SRC and DST data from traced packet
+
+        :param packet: packet to check
+        :return: dictionary of packet trace data
+        """
+
+        src_address_ipv4 = None
+        src_address_ipv6 = None
+        dst_address_ipv4 = None
+        dst_address_ipv6 = None
+
+        src_port = None
+        dst_port = None
+
+        # track src and dst ports of packet
+        if hasattr(packet, 'tcp'):
+            tcp_data = packet.tcp
+            src_port = tcp_data.srcport
+            dst_port = tcp_data.dstport
+
+        if hasattr(packet, 'ip'):
+            # packet contains at least one IPv4 address
+            ip_data = packet.ip
+
+            if hasattr(ip_data, 'src'):
+                src_address_ipv4 = ip_data.src
+            if hasattr(ip_data, 'dst'):
+                dst_address_ipv4 = ip_data.dst
+
+        if hasattr(packet, 'ipv6'):
+            # packet contains at least one IPv6 address
+            ipv6_data = packet.ipv6
+
+            if hasattr(ipv6_data, 'src'):
+                src_address_ipv6 = ipv6_data.src
+            if hasattr(ipv6_data, 'dst'):
+                dst_address_ipv6 = ipv6_data.dst
+
+        traced_packet_ip_addresses = {}
+
+        if src_address_ipv4:
+            traced_packet_ip_addresses["src"] = {
+                "addressType": "v4",
+                "address": src_address_ipv4,
+                "port": src_port,
+                "time": self.timestamp_to_string(packet)
+            }
+
+        if src_address_ipv6:
+            traced_packet_ip_addresses["src"] = {
+                "addressType": "v6",
+                "address": src_address_ipv6,
+                "port": src_port,
+                "time": self.timestamp_to_string(packet)
+            }
+
+        if dst_address_ipv4:
+            traced_packet_ip_addresses["dst"] = {
+                "addressType": "v4",
+                "address": dst_address_ipv4,
+                "port": dst_port,
+                "time": self.timestamp_to_string(packet)
+            }
+
+        if dst_address_ipv6:
+            traced_packet_ip_addresses["dst"] = {
+                "addressType": "v6",
+                "address": dst_address_ipv6,
+                "port": dst_port,
+                "time": self.timestamp_to_string(packet)
+            }
+
+        self.capture_logger.info(
+            f" detected TLS certificate packet for [IP{traced_packet_ip_addresses['src']['addressType']} "
+            f"{traced_packet_ip_addresses['src']['address']}:"
+            f"{traced_packet_ip_addresses['src']['port']}] ---(CERTIFICATE)---> "
+            f"[IP{traced_packet_ip_addresses['dst']['addressType']} "
+            f"{traced_packet_ip_addresses['dst']['address']}:{traced_packet_ip_addresses['dst']['port']}]"
+        )
+
+        return traced_packet_ip_addresses
