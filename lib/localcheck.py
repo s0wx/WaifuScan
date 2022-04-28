@@ -39,7 +39,7 @@ def checkagainstcerts(encodednew):
 def linuxmain():
     if not os.path.isdir('../CertificateFolder'):
         os.mkdir('../CertificateFolder')
-        print(f"Ordner für Zertifikate wird in {os.path} erstellt")
+        print(f"Ordner für Zertifikate wird in {os.getcwd()} erstellt")
     #Extra Ordner für
     if not os.path.isdir('../OSCerts'):
         os.mkdir('../OSCerts')
