@@ -2,21 +2,31 @@ name: WaifuScan
 channels:
   - defaults
 dependencies:
+  - astroid=2.9.0=py39hecd8cb5_0
   - ca-certificates=2022.3.29=hecd8cb5_1
   - certifi=2021.10.8=py39hecd8cb5_2
+  - isort=5.9.3=pyhd3eb1b0_0
+  - lazy-object-proxy=1.6.0=py39h9ed2024_0
   - libcxx=12.0.0=h2f01273_0
   - libffi=3.3=hb1e8313_2
+  - mccabe=0.7.0=pyhd3eb1b0_0
   - ncurses=6.3=hca72f7f_2
   - openssl=1.1.1n=hca72f7f_0
   - pip=21.2.4=py39hecd8cb5_0
+  - platformdirs=2.4.0=pyhd3eb1b0_0
+  - pylint=2.12.2=py39hecd8cb5_1
   - pymongo=3.12.0=py39h23ab428_0
   - python=3.9.12=hdfd78df_0
   - readline=8.1.2=hca72f7f_1
   - setuptools=61.2.0=py39hecd8cb5_0
   - sqlite=3.38.2=h707629a_0
   - tk=8.6.11=h7bc2e8c_0
+  - toml=0.10.2=pyhd3eb1b0_0
+  - typing-extensions=4.1.1=hd3eb1b0_0
+  - typing_extensions=4.1.1=pyh06a4308_0
   - tzdata=2022a=hda174b7_0
   - wheel=0.37.1=pyhd3eb1b0_0
+  - wrapt=1.13.3=py39hca72f7f_2
   - xz=5.2.5=h1de35cc_0
   - zlib=1.2.12=h4dc903c_2
   - pip:
