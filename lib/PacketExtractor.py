@@ -3,7 +3,7 @@ import os
 
 from datetime import datetime
 
-from lib.data_utilities import calculate_sha256_from_bytes
+from lib.byte_utilities import calculate_sha256_from_bytes
 from lib.file_processing import save_certificate
 from lib.mongo_utilities import certificate_database
 

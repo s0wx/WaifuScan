@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import os
 import subprocess
@@ -41,6 +42,19 @@ def filetype_from_path(root_path, file):
     # only use the part with the file type from the output
     file_info = file_type_command.decode("utf-8").split(":")[-1].strip()
     return file_info.lower()
+
+
+def calculate_sha256_from_bytes(byte_data):
+    """
+    Calculate SHA256 Hash of ByteData
+
+    :param byte_data: byte data of file
+    :return: hash of file content
+    """
+
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(byte_data)
+    return sha256_hash.hexdigest()
 
 
 def update_missing_cert_attributes():
