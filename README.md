@@ -1,5 +1,21 @@
 # WaifuScan
 
+## Installation and Usage
+
+### macOS
+
+1. Required to use tshark: <br>`brew install --cask wireshark`
+2. Add MongoDB repo to brew: <br>`brew tap mongodb/brew`
+3. Install MongoDB with brew: <br>`brew install mongodb/brew/mongodb-community mongosh mongodb-compass`
+4. Update existing conda env with required packages: <br>`conda env update --file environment.yml --prune`
+
+Usage:
+- Start the MongoDB (required for sync): <br>`./start_mongo.sh`
+- Start to sniff Wi-Fi network interface on macOS<br>`python3 waifu_scan.py -N en0`
+- Crawl every folder on the filesystem starting in root folder:<br>`python3 waifu_scan.py -L "/"`
+
+## Features
+
 ### Network Sniffing
 - Live Sniffing for SSL/TLS certificates for provided network interface
 - Analyse pcap(ng) files to collect certificates
@@ -18,4 +34,4 @@
 
 ### Logging
 - all certificates are tracked with inbound and outbound connections
-- IP and Host are logged to stdout during execution
+- IP:Port of source and destination address are logged to stdout during execution
