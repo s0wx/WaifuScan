@@ -1,8 +1,8 @@
 import hashlib
 import os
 import shutil
-from sys import platform
 import ssl
+from sys import platform
 
 
 def calculate_sha256_from_bytes(byte_data):
@@ -30,7 +30,7 @@ def splitcerts(certificates):
 
 
 def checkos():
-    if platform == "linux" or platform == "linux2":
+    if platform in ["linux", "linux2"]:
         return 0
     elif platform == "darwin":
         # MacOS
@@ -41,7 +41,7 @@ def checkos():
 
 def checkagainstcerts(encodednew):
     directory = 'CertificateFolder'
-    if checkos() == 0 or checkos() == 1:
+    if checkos() in [0, 1]:
         return not os.path.isfile(f'{directory}/{encodednew}.crt')
     if checkos() == 2:
         return not os.path.isfile(f'{directory}\{encodednew}.crt')

@@ -8,7 +8,7 @@ def read_file_bytes_pattern(file_path):
 
 # TODO experimental
 def compare_byte_pattern(check, reference):
-    if (len(check) >= len(reference)):
+    if len(check) >= len(reference):
         ref_copy = reference.copy()
         for key, value in reference.items():
             if key not in check or check[key] != reference[key]:

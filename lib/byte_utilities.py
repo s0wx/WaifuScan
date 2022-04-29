@@ -3,8 +3,6 @@ import logging
 import os
 import subprocess
 
-from lib.mongo_utilities import certificate_database
-
 
 def filetype_from_bytes(data_bytes):
     """
@@ -57,7 +55,7 @@ def calculate_sha256_from_bytes(byte_data):
     return sha256_hash.hexdigest()
 
 
-def update_missing_cert_attributes():
+def update_missing_cert_attributes(database):
     """
     Add missing certificate attributes to non-matching objects. Currently the fileType.
 
@@ -67,9 +65,9 @@ def update_missing_cert_attributes():
     capture_logger = logging.getLogger("[WaifuScan] (DB Alignment)")
     capture_logger.setLevel(level=logging.INFO)
 
-    for doc in certificate_database.certificates_collection.find({"dataType": None}):
+    for doc in database.certificates_collection.find({"dataType": None}):
         file_type = filetype_from_bytes(doc["certificateBytes"])
-        certificate_database.certificates_collection.update_one(
+        database.certificates_collection.update_one(
             {"_id": doc["_id"]},
             {"$set": {
                 "dataType": file_type
@@ -79,7 +77,7 @@ def update_missing_cert_attributes():
     capture_logger.info("successfully aligned all database entries")
 
 
-def export_database():
+def export_database(database):
     """
     export certificate database
 
@@ -89,7 +87,7 @@ def export_database():
     capture_logger = logging.getLogger("[WaifuScan] (DB Export)")
     capture_logger.setLevel(level=logging.INFO)
 
-    for doc in certificate_database.certificates_collection.find():
+    for doc in database.certificates_collection.find():
         file_bytes = doc["certificateBytes"]
 
         if "certificate" in doc["dataType"]:

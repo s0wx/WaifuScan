@@ -1,22 +1,22 @@
 import logging
 import os
-from collections import defaultdict
-
 from datetime import datetime
 
 from lib.byte_utilities import calculate_sha256_from_bytes
 from lib.file_processing import save_certificate
-from lib.mongo_utilities import certificate_database
+from lib.mongo_utilities import CertificateDatabase
 
 
 class PacketExtractor:
-    def __init__(self):
-        """
-        Used to extract relevant packet data to storage solutions like the filesystem, a database or both
-        """
+    """
+    Used to extract relevant packet data to storage solutions
+    like the filesystem, a database or both.
+    """
 
+    def __init__(self, database: CertificateDatabase):
         self.capture_logger = logging.getLogger("[WaifuScan] (Extractor)")
         self.capture_logger.setLevel(level=logging.INFO)
+        self.database = database
 
     def extract_to_local(self, packet, file_path="extracted_certificates/live_capture_cert.crt"):
         """
@@ -32,8 +32,11 @@ class PacketExtractor:
             _ = self.get_packet_tracing(packet_full)
             cert_data = self.tls_certificate_to_bytes(packet_tls)
             certificate_hash = calculate_sha256_from_bytes(cert_data)
+
             file_path_split = file_path.split(".")
-            new_file_path = "".join(file_path_split[:-1]) + certificate_hash + "".join(file_path_split[-1:])
+            new_file_path = "".join(file_path_split[:-1]) + \
+                            certificate_hash + \
+                            "".join(file_path_split[-1:])
 
             if not os.path.exists(new_file_path):
                 save_certificate(cert_data, new_file_path)
@@ -54,7 +57,7 @@ class PacketExtractor:
             _ = self.get_packet_tracing(packet_full)
             cert_data = self.tls_certificate_to_bytes(packet_tls)
             certificate_hash = calculate_sha256_from_bytes(cert_data)
-            certificate_database.add_certificate({
+            self.database.add_certificate({
                 "sha256": certificate_hash,
                 "certificateBytes": cert_data
             }, self.capture_logger)
