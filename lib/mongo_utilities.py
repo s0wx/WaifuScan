@@ -15,7 +15,7 @@ class CertificateDatabase:
     def add_certificate(self, certificate_complete, logger):
         if not self.certificates_collection.find_one({"sha256": certificate_complete["sha256"]}):
             self.certificates_collection.insert_one(certificate_complete)
-            logger.info(f"Saved certificate {certificate_complete['sha256']} to database")
+            logger.info(f" saved certificate {certificate_complete['sha256']} to database")
 
 
 certificate_database = CertificateDatabase()

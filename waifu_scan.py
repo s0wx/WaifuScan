@@ -2,7 +2,6 @@ import logging
 import argparse
 
 from lib.PacketExtractor import PacketExtractor
-from lib.file_capture import full_extract_from_file
 from lib.file_processing import check_required_folders
 from lib.byte_utilities import update_missing_cert_attributes, export_database
 from lib.NetworkScan import NetworkScan
