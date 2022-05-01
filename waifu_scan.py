@@ -54,7 +54,6 @@ if __name__ == '__main__':
     )
 
     args = parser.parse_args()
-
     database = CertificateDatabase()
     packet_extractor = PacketExtractor(database)
 
@@ -65,16 +64,16 @@ if __name__ == '__main__':
 
     # Run File System Scan
     elif args.local:
-        filesystem_scanner = FilesystemScan(extractor=packet_extractor)
+        filesystem_scanner = FilesystemScan()
         filesystem_scanner.start_tls_cert_scan(
+            database=database,
             start_path=args.local[0]
         )
 
     # Run Traffic Dump Scan
     elif args.file:
-        packet_extractor = PacketExtractor(database)
-        dump_scanner = FilesystemScan(extractor=packet_extractor)
-        dump_scanner.scan_tls_certs_from_dump(args.file)
+        dump_scanner = FilesystemScan()
+        dump_scanner.scan_tls_certs_from_dump(extractor=packet_extractor, file_path=args.file)
 
     # Align Database entries to use same properties
     elif args.dbAlign:
