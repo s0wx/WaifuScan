@@ -35,3 +35,7 @@ Usage:
 ### Logging
 - all certificates are tracked with inbound and outbound connections
 - IP:Port of source and destination address are logged to stdout during execution
+
+## Disclaimer
+
+I am not responsible for anything done with this tool. You use it at your own risk. There are no warranties or guarantees expressed or implied. You assume all responsibility and liability.
